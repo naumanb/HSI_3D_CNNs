@@ -1,7 +1,7 @@
 import tensorflow as tf
 from keras import layers 
-from keras.models import Sequential
-from keras.layers import Conv2D, Conv3D, MaxPooling2D, MaxPooling3D, Flatten, Dense, Dropout
+from keras.models import Sequential, Model
+from keras.layers import Conv2D, Conv3D, MaxPooling2D, MaxPooling3D, Flatten, Dense, Dropout, Input, UpSampling2D, concatenate
 
 import numpy as np
 
@@ -37,7 +37,27 @@ def build_3d_cnn(input_shape, num_classes):
 
 #  U-Net architecture 
 def build_unet(input_shape, num_classes):
-    pass  
+    inputs = Input(input_shape)
+    
+    conv1 = Conv2D(32, (3, 3), activation='relu', padding='same')(inputs)
+    pool1 = MaxPooling2D(pool_size=(2, 2))(conv1)
+    
+    conv2 = Conv2D(64, (3, 3), activation='relu', padding='same')(pool1)
+    pool2 = MaxPooling2D(pool_size=(2, 2))(conv2)
+    
+    conv3 = Conv2D(128, (3, 3), activation='relu', padding='same')(pool2)
+    pool3 = MaxPooling2D(pool_size=(2, 2))(conv3)
+
+    up4 = concatenate([UpSampling2D(size=(2, 2))(conv3), conv2], axis=3)
+    conv4 = Conv2D(64, (3, 3), activation='relu', padding='same')(up4)
+
+    up5 = concatenate([UpSampling2D(size=(2, 2))(conv4), conv1], axis=3)
+    conv5 = Conv2D(32, (3, 3), activation='relu', padding='same')(up5)
+
+    outputs = Conv2D(num_classes, (1, 1), activation='softmax')(conv5)
+
+    model = Model(inputs=[inputs], outputs=[outputs])
+    return model 
 
 # ResNet50 architecture
 def build_resnet50(input_shape, num_classes):

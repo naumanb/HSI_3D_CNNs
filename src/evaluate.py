@@ -43,17 +43,19 @@ def train_and_evaluate(model_builder, input_shape, num_classes, data, labels, ep
         test_data = data[test_idx[0]]
         test_labels = labels[test_idx[0]]
 
-        # Stack and reshape training data
+        # Stack and reshape data
         train_data = np.stack(train_data, axis=0)
+        test_data = np.expand_dims(test_data, axis=0)
 
-        # Stack and reshape training labels
+        # Stack and reshape labels
         train_labels = np.stack(train_labels, axis=0)
+        test_labels = np.expand_dims(test_labels, axis=0)
 
         model = model_builder(input_shape, num_classes)
         model.compile(optimizer='adam', loss= masked_sparse_categorical_crossentropy, metrics=[masked_sparse_categorical_accuracy])
 
-        model.fit(train_data, train_labels, epochs=epochs, batch_size=batch_size, verbose=0)
-        score = model.evaluate(np.expand_dims(test_data, axis=0), test_labels, verbose=0)
+        model.fit(train_data, train_labels, epochs=epochs, batch_size=batch_size, verbose=1)
+        score = model.evaluate(test_data, test_labels, verbose=0)
         scores.append(score)
 
         # Store true labels and predictions for classification report

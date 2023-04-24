@@ -51,12 +51,12 @@ sample_image_path = os.path.join(image_dir, mat_files[sample_image_index].replac
 # Initialize a list to store the predictions from each fold
 all_predictions = []
 
-architectures = ['2D_CNN']
+architectures = ['U-Net']
 num_channels = cropped_images[0].shape[2]
 input_shape = (324, 324, 128)
 num_classes = 4 
-epochs = 200
-batch_size = 4 
+epochs = 50
+batch_size = 8
 
 for arch in architectures:
     print(f"Training and evaluating {arch}...")
