@@ -1,43 +1,69 @@
 from sklearn.model_selection import LeaveOneOut
 from sklearn.metrics import classification_report
+from keras.losses import SparseCategoricalCrossentropy
+import tensorflow as tf
 import numpy as np
+
+# Define a custom loss function that ignores the padding in the labels (unlabeled pixels)
+def masked_sparse_categorical_crossentropy(y_true, y_pred):
+    y_true = tf.cast(y_true, tf.int32)
+    mask = tf.not_equal(y_true, 0)
+    y_true_adjusted = y_true - 1
+    y_true_adjusted = tf.where(mask, y_true_adjusted, 0)
+
+    loss = tf.keras.losses.sparse_categorical_crossentropy(y_true_adjusted, y_pred, from_logits=False)
+    mask = tf.cast(mask, loss.dtype)
+    loss *= mask
+
+    return tf.reduce_mean(loss)
+
+# Define a custom accuracy metric that ignores the padding in the labels (unlabeled pixels)
+def masked_sparse_categorical_accuracy(y_true, y_pred):
+    y_true = tf.cast(y_true, tf.int32)
+    mask = tf.not_equal(y_true, 0)
+    y_true_adjusted = y_true - 1
+    y_true_adjusted = tf.where(mask, y_true_adjusted, 0)
+
+    matches = tf.cast(tf.equal(y_true_adjusted, tf.argmax(y_pred, axis=-1, output_type=tf.int32)), tf.float32)
+    mask = tf.cast(mask, matches.dtype)
+    matches *= mask
+    return tf.reduce_sum(matches) / tf.reduce_sum(mask)
 
 # Train and evaluate the model using leave-one-out cross-validation
 def train_and_evaluate(model_builder, input_shape, num_classes, data, labels, epochs, batch_size):
     loo = LeaveOneOut()
-    metrics = []
+    scores = []
+    y_true = []
+    y_pred = []
 
     for train_idx, test_idx in loo.split(data):
 
-        train_idx = train_idx.tolist()
-        test_idx = test_idx.tolist()
+        train_data = [data[i] for i in train_idx]
+        train_labels = [labels[i] for i in train_idx]
+        test_data = data[test_idx[0]]
+        test_labels = labels[test_idx[0]]
 
-        train_data, train_labels = [data[i] for i in train_idx], [labels[i] for i in train_idx]
-        test_data, test_labels = [data[i] for i in test_idx], [labels[i] for i in test_idx]
-
+        # Stack and reshape training data
         train_data = np.stack(train_data, axis=0)
+
+        # Stack and reshape training labels
         train_labels = np.stack(train_labels, axis=0)
 
-
         model = model_builder(input_shape, num_classes)
-        model.compile(optimizer='adam', loss='sparse_categorical_crossentropy', metrics=['accuracy'])
+        model.compile(optimizer='adam', loss= masked_sparse_categorical_crossentropy, metrics=[masked_sparse_categorical_accuracy])
 
-        model.fit(train_data, train_labels, epochs=epochs, batch_size=batch_size, verbose=1)
-        predictions = np.argmax(model.predict(test_data), axis=-1)
+        model.fit(train_data, train_labels, epochs=epochs, batch_size=batch_size, verbose=0)
+        score = model.evaluate(np.expand_dims(test_data, axis=0), test_labels, verbose=0)
+        scores.append(score)
 
-        # Calculate performance metrics
-        report = classification_report(test_labels.ravel(), predictions.ravel(), output_dict=True, zero_division=0)
-        metrics.append(report)
+        # Store true labels and predictions for classification report
+        y_true.extend(test_labels.flatten())
+        y_pred.extend(np.argmax(model.predict(test_data.reshape((-1, input_shape[2]))), axis=1))
 
     # Calculate average performance metrics
-    avg_metrics = {}
-    metric_keys = metrics[0].keys()
-    for key in metric_keys:
-        if isinstance(metrics[0][key], dict):
-            avg_metrics[key] = {}
-            for sub_key in metrics[0][key].keys():
-                avg_metrics[key][sub_key] = np.mean([m[key][sub_key] for m in metrics])
-        else:
-            avg_metrics[key] = np.mean([m[key] for m in metrics])
+    avg_score = np.mean(scores, axis=0)
 
-    return avg_metrics
+    # Calculate classification report
+    report = classification_report(y_true, y_pred)
+
+    return avg_score, report

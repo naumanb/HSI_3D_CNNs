@@ -19,7 +19,7 @@ def display_jpg_image(path, target_dim):
 # Plot ground truth labels
 def visualize_ground_truth(labels, target_dim):
     color_map = np.zeros((*labels.shape, 3))
-    color_map[labels == 0] = [1, 1, 1]  # White
+    color_map[labels == 0] = [1, 1, 1]  # Unlabeled pixels are white
     color_map[labels == 1] = [0, 1, 0]  # Green for Normal
     color_map[labels == 2] = [1, 0, 0]  # Red for Tumor
     color_map[labels == 3] = [0, 0, 1]  # Blue for Hypervascular

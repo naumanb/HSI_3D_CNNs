@@ -5,7 +5,8 @@ from data_processing.data_splitting import get_leave_one_out_splits
 from data_processing.data_visualization import visualize_rgb_image, visualize_ground_truth, display_jpg_image
 from evaluate import train_and_evaluate
 
-from cnn_models import build_2d_cnn, build_3d_cnn, build_unet, build_resnet50, train_and_evaluate
+from cnn_models import build_2d_cnn, build_3d_cnn, build_unet, build_resnet50
+from evaluate import train_and_evaluate
 
 # Defining path to data folder
 data_folder = 'data'
@@ -39,19 +40,20 @@ if min_dim != min_label_dim:
 sample_image_index = image_indices[0]
 image_dir = 'images'
 sample_image_path = os.path.join(image_dir, mat_files[sample_image_index].replace('.mat', '.jpg'))
-display_jpg_image(sample_image_path, min_dim)
+# display_jpg_image(sample_image_path, min_dim)
 
-# Visualize the ground truth map for the sample image
-visualize_ground_truth(filtered_labels[sample_image_index], min_label_dim)
+## Visualize the ground truth map for the sample image
+# visualize_ground_truth(filtered_labels[sample_image_index], min_label_dim)
 
-# Get the leave-one-out cross-validation splits
-splits = get_leave_one_out_splits(cropped_images, cropped_label_data)
+## Get the leave-one-out cross-validation splits
+# splits = get_leave_one_out_splits(cropped_images, cropped_label_data)
 
 # Initialize a list to store the predictions from each fold
 all_predictions = []
 
 architectures = ['2D_CNN']
-input_shape = (min_dim,min_dim,128) # Spatial dim x Spatial dim x Spectral dim
+num_channels = cropped_images[0].shape[2]
+input_shape = (324, 324, 128)
 num_classes = 4 
 epochs = 200
 batch_size = 4 
