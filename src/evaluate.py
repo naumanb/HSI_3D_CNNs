@@ -11,7 +11,7 @@ def masked_sparse_categorical_crossentropy(y_true, y_pred):
     y_true_adjusted = y_true - 1
     y_true_adjusted = tf.where(mask, y_true_adjusted, 0)
 
-    loss = tf.keras.losses.sparse_categorical_crossentropy(y_true_adjusted, y_pred, from_logits=False)
+    loss = SparseCategoricalCrossentropy(y_true_adjusted, y_pred, from_logits=False)
     mask = tf.cast(mask, loss.dtype)
     loss *= mask
 
@@ -59,8 +59,8 @@ def train_and_evaluate(model_builder, input_shape, num_classes, data, labels, ep
         scores.append(score)
 
         # Store true labels and predictions for classification report
-        y_true.extend(test_labels.flatten())
-        y_pred.extend(np.argmax(model.predict(test_data.reshape((-1, input_shape[2]))), axis=1))
+        y_true.extend(test_labels.reshape(-1))  # Flatten the 2D array to 1D
+        y_pred.extend(np.argmax(model.predict(test_data), axis=1).reshape(-1))  # Flatten the 2D array to 1D
 
     # Calculate average performance metrics
     avg_score = np.mean(scores, axis=0)
@@ -68,4 +68,4 @@ def train_and_evaluate(model_builder, input_shape, num_classes, data, labels, ep
     # Calculate classification report
     report = classification_report(y_true, y_pred)
 
-    return avg_score, report
+    return avg_score, report, y_true, y_pred

@@ -8,6 +8,8 @@ from evaluate import train_and_evaluate
 from cnn_models import build_2d_cnn, build_3d_cnn, build_unet, build_resnet50
 from evaluate import train_and_evaluate
 
+from utils.save_report import save_classification_report
+
 # Defining path to data folder
 data_folder = 'data'
 
@@ -45,18 +47,15 @@ sample_image_path = os.path.join(image_dir, mat_files[sample_image_index].replac
 ## Visualize the ground truth map for the sample image
 # visualize_ground_truth(filtered_labels[sample_image_index], min_label_dim)
 
-## Get the leave-one-out cross-validation splits
-# splits = get_leave_one_out_splits(cropped_images, cropped_label_data)
-
 # Initialize a list to store the predictions from each fold
 all_predictions = []
 
 architectures = ['U-Net']
 num_channels = cropped_images[0].shape[2]
-input_shape = (324, 324, 128)
+input_shape = (0, 324, 324, 128) # Manually set the input shape for variable batch sizing
 num_classes = 4 
 epochs = 50
-batch_size = 8
+batch_size = 16
 
 for arch in architectures:
     print(f"Training and evaluating {arch}...")
@@ -70,31 +69,11 @@ for arch in architectures:
     elif arch == 'ResNet50':
         model_builder = build_resnet50
 
-    avg_metrics = train_and_evaluate(model_builder, input_shape, num_classes, cropped_images, cropped_label_data, epochs, batch_size)
+    avg_metrics, report, y_true, y_pred = train_and_evaluate(model_builder, input_shape, num_classes, cropped_images, cropped_label_data, epochs, batch_size)
     print(avg_metrics)
+    print(report)
 
-
-# # Perform leave-one-out cross-validation
-# for train_indices, test_indices in splits:
-#     # Split the data into training and testing sets
-#     X_train, X_test = preprocessed_data[train_indices], preprocessed_data[test_indices]
-#     y_train, y_test = preprocessed_labels[train_indices], preprocessed_labels[test_indices]
-
-#     input_shape = X_train.shape[1:]  # Get the shape of the input data
-
-#     # Build and train the 3D CNN model
-#     model = build_3d_cnn_model()
-#     model.fit(X_train, y_train, epochs=30, batch_size=4)
-
-#     # Evaluate the model on the test set and store the predictions
-#     predictions = model.predict(X_test)
-#     all_predictions.append(predictions)
-
-#     # Discard the model
-#     del model
-
-# # Combine the predictions from all folds
-# all_predictions = np.concatenate(all_predictions)
-
-# Compute the performance metrics for classification and semantic segmentation using the aggregated predictions
-# (Compute metrics like accuracy, precision, recall, F1-score, etc., based on your project requirements)
+    # Saving the classification report to results folder
+    output_folder = 'results'
+    file_name = 'classification_report.txt'
+    save_classification_report(y_true, y_pred, output_folder, file_name, arch)

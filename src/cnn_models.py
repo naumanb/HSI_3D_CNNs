@@ -6,23 +6,29 @@ from keras.layers import Conv2D, Conv3D, MaxPooling2D, MaxPooling3D, Flatten, De
 import numpy as np
 
 # 2D CNN architecture 
-# Input shape should be (height, width, num_spectra, 1)
 def build_2d_cnn(input_shape, num_classes=4, dropout_rate=0.5):
     model = Sequential()
-    model.add(Conv2D(32, kernel_size=(3, 3), activation='relu', input_shape=input_shape))
+    model.add(Conv2D(32, kernel_size=(3, 3), activation='relu', padding='same', input_shape=input_shape))
     model.add(MaxPooling2D(pool_size=(2, 2)))
-    model.add(Conv2D(64, kernel_size=(3, 3), activation='relu'))
+    model.add(Conv2D(64, kernel_size=(3, 3), activation='relu', padding='same'))
     model.add(MaxPooling2D(pool_size=(2, 2)))
-    model.add(Conv2D(128, kernel_size=(3, 3), activation='relu'))
+    model.add(Conv2D(128, kernel_size=(3, 3), activation='relu', padding='same'))
     model.add(MaxPooling2D(pool_size=(2, 2)))
-    model.add(Flatten())
-    model.add(Dense(128, activation='relu'))
-    model.add(Dropout(dropout_rate))
-    model.add(Dense(num_classes, activation='softmax'))
+
+    # Upsampling path
+    model.add(UpSampling2D(size=(2, 2)))
+    model.add(Conv2D(128, kernel_size=(3, 3), activation='relu', padding='same'))
+    model.add(UpSampling2D(size=(2, 2)))
+    model.add(Conv2D(64, kernel_size=(3, 3), activation='relu', padding='same'))
+    model.add(UpSampling2D(size=(2, 2)))
+    model.add(Conv2D(32, kernel_size=(3, 3), activation='relu', padding='same'))
+
+    # Final output layer
+    model.add(Conv2D(num_classes, kernel_size=(1, 1), activation='softmax'))
+
     return model
 
 # 3D CNN architecture
-# Input shape should be (num_images, height, width, num_spectra, 1)
 def build_3d_cnn(input_shape, num_classes):
     model = Sequential()
     model.add(Conv3D(32, (3, 3, 3), activation='relu', input_shape=input_shape, padding='same'))
