@@ -1,6 +1,6 @@
-from sklearn.model_selection import LeaveOneOut
+
 from sklearn.metrics import classification_report
-from keras.losses import sparse_categorical_crossentropy
+from data_processing.data_splitting import get_leave_one_out_splits
 import tensorflow as tf
 import numpy as np
 
@@ -11,7 +11,7 @@ def masked_sparse_categorical_crossentropy(y_true, y_pred):
     y_true_adjusted = y_true - 1
     y_true_adjusted = tf.where(mask, y_true_adjusted, 0)
 
-    loss = tf.keras.losses.sparse_categorical_crossentropy(y_true_adjusted, y_pred, from_logits=False)
+    loss = tf.keras.losses.sparse_categorical_crossentropy(y_true_adjusted, y_pred, from_logits=False, axis=-1)
     mask = tf.cast(mask, loss.dtype)
     loss *= mask
 
@@ -29,46 +29,43 @@ def masked_sparse_categorical_accuracy(y_true, y_pred):
     matches *= mask
     return tf.reduce_sum(matches) / tf.reduce_sum(mask)
 
+
 # Train and evaluate the model using leave-one-out cross-validation
-def train_and_evaluate(model_builder, input_shape, num_classes, data, labels, epochs, batch_size):
-    loo = LeaveOneOut()
+def train_and_evaluate(model_builder, num_classes, X, y, epochs, batch_size, reshape=False):
+    
     scores = []
     y_true = []
     y_pred = []
 
-    for train_idx, test_idx in loo.split(data):
+    num_samples = X.shape[0]
+    input_shape = (X.shape[1], X.shape[2], X.shape[3]) if len(X.shape) > 3 else (X.shape[1], X.shape[2])
 
-        train_data = [data[i] for i in train_idx]
-        train_labels = [labels[i] for i in train_idx]
-        test_data = data[test_idx[0]]
-        test_labels = labels[test_idx[0]]
+    
+    train_indices, test_indices = get_leave_one_out_splits(X,y)
 
-        # Stack and reshape data
-        train_data = np.stack(train_data, axis=0)
-        test_data = np.expand_dims(test_data, axis=0)
+    for train_index, test_index in zip(train_indices, test_indices):
 
-        # Stack and reshape labels
-        train_labels = np.stack(train_labels, axis=0)
-        test_labels = np.expand_dims(test_labels, axis=0)
+        X_train, X_test = X[train_index], X[test_index]
+        y_train, y_test = y[train_index], y[test_index]
 
-        model = model_builder(input_shape, num_classes)
+        model = model_builder(input_shape=input_shape, num_classes=num_classes)
+
         model.compile(optimizer='adam', loss= masked_sparse_categorical_crossentropy, metrics=[masked_sparse_categorical_accuracy])
 
-        model.fit(train_data, train_labels, epochs=epochs, batch_size=batch_size, verbose=1)
-        score = model.evaluate(test_data, test_labels, verbose=0)
+        model.fit(X_train, y_train, epochs=epochs, batch_size=batch_size, verbose=1)
+        score = model.evaluate(X_test, y_test, verbose=0)
         scores.append(score)
 
-        print("test_labels shape:", test_labels.shape)
-        print("Predicted labels shape:", np.argmax(model.predict(test_data), axis=1).shape)
-
         # Store true labels and predictions for classification report
-        y_true.extend(np.ravel(test_labels))
-        y_pred.extend(np.argmax(model.predict(test_data), axis=-1).ravel())
+        y_true.extend(np.ravel(y_test))
+        y_pred.extend(np.argmax(model.predict(X_test), axis=-1).ravel())
 
     # Calculate average performance metrics
     avg_score = np.mean(scores, axis=0)
 
-    # Calculate classification report
-    report = classification_report(y_true, y_pred)
+    # Calculate classification report only for labelled pixels
+    filtered_y_true = [value for value in y_true if value != 0]
+    filtered_y_pred = [pred for pred, true in zip(y_pred, y_true) if true != 0]
+    report = classification_report(filtered_y_true, filtered_y_pred)
 
     return avg_score, report, y_true, y_pred

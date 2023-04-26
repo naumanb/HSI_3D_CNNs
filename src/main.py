@@ -5,7 +5,7 @@ from data_processing.data_splitting import get_leave_one_out_splits
 from data_processing.data_visualization import visualize_rgb_image, visualize_ground_truth, display_jpg_image
 from evaluate import train_and_evaluate
 
-from models.cnn_models import build_2d_cnn, build_3d_cnn, build_unet, build_resnet50
+from models.cnn_models import build_1d_cnn, build_2d_cnn, build_1d_2d_cnn, build_2d_1d_cnn, build_3d_cnn
 from evaluate import train_and_evaluate
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
@@ -52,28 +52,41 @@ sample_image_path = os.path.join(image_dir, mat_files[sample_image_index].replac
 # Initialize a list to store the predictions from each fold
 all_predictions = []
 
-architectures = ['U-Net']
-num_channels = cropped_images[0].shape[2]
+architectures = ['2D_CNN'] # Architectures to train and evaluate
+
+cropped_images = np.array(cropped_images)
+num_samples, height, width, num_channels = cropped_images.shape
+
 input_shape = (324, 324, 128) # Manually set the input shape for variable batch sizing
 num_classes = 4 
 epochs = 50
-batch_size = 16
+batch_size = 4
 
 # Train and evaluate the model for each architecture
 for arch in architectures:
     print(f"Training and evaluating {arch}...")
-
-    if arch == '2D_CNN':
+    reshape = False
+    if arch == '1D_CNN':
+        reshape = True
+        model_builder = build_1d_cnn
+    elif arch == '2D_CNN':
         model_builder = build_2d_cnn
+    elif arch == '1D_2D_CNN':
+        model_builder = build_1d_2d_cnn
+    elif arch == '2D_1D_CNN':
+        model_builder = build_2d_1d_cnn
     elif arch == '3D_CNN':
         model_builder = build_3d_cnn
-    elif arch == 'U-Net':
-        model_builder = build_unet
-    elif arch == 'ResNet50':
-        model_builder = build_resnet50
 
+    if arch == '1D_CNN':
+        # Reshape the data for 1D_CNN
+        X = np.array(cropped_images).reshape(num_samples, height * width, num_channels)
+        y = np.array(cropped_label_data).reshape(num_samples, height * width)
+    else:
+        X = np.array(cropped_images)
+        y = np.array(cropped_label_data)
 
-    avg_metrics, report, y_true, y_pred = train_and_evaluate(model_builder, input_shape, num_classes, cropped_images, cropped_label_data, epochs, batch_size)
+    avg_metrics, report, y_true, y_pred = train_and_evaluate(model_builder, num_classes, X, y, epochs, batch_size, reshape)
     print(avg_metrics)
     print(report)
 

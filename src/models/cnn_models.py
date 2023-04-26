@@ -19,7 +19,8 @@ def build_1d_cnn(input_shape, num_classes=4, dropout_rate=0.5):
     flatten = Flatten()(pool2)
     dense = Dense(128, activation='relu')(flatten)
 
-    outputs = Dense(num_classes, activation='softmax')(dense)
+    outputs = Dense(num_classes * input_shape[0], activation='softmax')(dense)
+    outputs = Reshape((input_shape[0], num_classes))(outputs)
 
     model = Model(inputs=[inputs], outputs=[outputs])
     return model
@@ -28,11 +29,11 @@ def build_1d_cnn(input_shape, num_classes=4, dropout_rate=0.5):
 def build_2d_cnn(input_shape, num_classes=4, dropout_rate=0.5):
     model = Sequential()
     model.add(Conv2D(32, kernel_size=(3, 3), activation='relu', padding='same', input_shape=input_shape))
-    model.add(MaxPooling2D(pool_size=(2, 2)))
+    model.add(MaxPooling2D(pool_size=(2, 2), padding='same'))
     model.add(Conv2D(64, kernel_size=(3, 3), activation='relu', padding='same'))
-    model.add(MaxPooling2D(pool_size=(2, 2)))
+    model.add(MaxPooling2D(pool_size=(2, 2), padding='same'))
     model.add(Conv2D(128, kernel_size=(3, 3), activation='relu', padding='same'))
-    model.add(MaxPooling2D(pool_size=(2, 2)))
+    model.add(MaxPooling2D(pool_size=(2, 2), padding='same'))
 
     # Upsampling path
     model.add(UpSampling2D(size=(2, 2)))

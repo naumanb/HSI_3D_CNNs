@@ -11,4 +11,7 @@ def get_leave_one_out_splits(X, y):
     # Split the data into training and testing sets using leave-one-out cross-validation
     splits = list(loo.split(X, y))
 
-    return splits
+    train_indices = [train_idx for train_idx, _ in splits]
+    test_indices = [test_idx for _, test_idx in splits]
+
+    return train_indices, test_indices
