@@ -30,7 +30,7 @@ pip install -r requirements.txt
 
 1. Place your preprocessed (denoised) hyperspectral image data in the `data` folder. The files should be in `.mat` format.
 
-2. Execute the `main.py` script to train and evaluate the CNN architectures on the dataset:
+2. Execute the `main.py` script in the `src` folder to train and evaluate the CNN architectures on the dataset:
 
 ```python
 python main.py
