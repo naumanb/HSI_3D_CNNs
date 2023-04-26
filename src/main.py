@@ -1,14 +1,16 @@
 import numpy as np
-import os
+import os, sys
 from data_processing.data_preprocessing import load_all_mat_data, preprocess_data, crop_all_images
 from data_processing.data_splitting import get_leave_one_out_splits
 from data_processing.data_visualization import visualize_rgb_image, visualize_ground_truth, display_jpg_image
 from evaluate import train_and_evaluate
 
-from cnn_models import build_2d_cnn, build_3d_cnn, build_unet, build_resnet50
+from models.cnn_models import build_2d_cnn, build_3d_cnn, build_unet, build_resnet50
 from evaluate import train_and_evaluate
 
-from utils.save_report import save_classification_report
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+
+from utils.save_report import save_outputs
 
 # Defining path to data folder
 data_folder = 'data'
@@ -52,11 +54,12 @@ all_predictions = []
 
 architectures = ['U-Net']
 num_channels = cropped_images[0].shape[2]
-input_shape = (0, 324, 324, 128) # Manually set the input shape for variable batch sizing
+input_shape = (324, 324, 128) # Manually set the input shape for variable batch sizing
 num_classes = 4 
 epochs = 50
 batch_size = 16
 
+# Train and evaluate the model for each architecture
 for arch in architectures:
     print(f"Training and evaluating {arch}...")
 
@@ -69,6 +72,7 @@ for arch in architectures:
     elif arch == 'ResNet50':
         model_builder = build_resnet50
 
+
     avg_metrics, report, y_true, y_pred = train_and_evaluate(model_builder, input_shape, num_classes, cropped_images, cropped_label_data, epochs, batch_size)
     print(avg_metrics)
     print(report)
@@ -76,4 +80,4 @@ for arch in architectures:
     # Saving the classification report to results folder
     output_folder = 'results'
     file_name = 'classification_report.txt'
-    save_classification_report(y_true, y_pred, output_folder, file_name, arch)
+    save_outputs(y_true, y_pred, output_folder, file_name, arch)
