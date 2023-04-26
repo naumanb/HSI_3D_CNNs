@@ -1,6 +1,6 @@
 # Comparison of CNN Architectures for Brain Cancer Hyperspectral Image Classification
 
-This project aims to compare various Convolutional Neural Network (CNN) architectures for classifying brain cancer in Hyperspectral Images (HSI). The implemented architectures include 2D CNN, 3D CNN, U-Net, and ResNet50. The models are trained and evaluated using the leave-one-out cross-validation method on a dataset of hyperspectral brain cancer images.
+This project aims to compare various Convolutional Neural Network (CNN) architectures for classifying brain cancer in Hyperspectral Images (HSI). The implemented architectures include 1D CNN, 2D CNN, 1D + 2D Hybrid CNN, 2D + 1D Hybrid CNN, and 3D CNN. The models are trained and evaluated using the leave-one-out cross-validation method on a dataset of hyperspectral brain cancer images.
 
 ## Getting Started
 
@@ -28,7 +28,7 @@ pip install -r requirements.txt
 
 ## Usage
 
-1. Place your hyperspectral image data in the `data` folder. The files should be in `.mat` format.
+1. Place your preprocessed (denoised) hyperspectral image data in the `data` folder. The files should be in `.mat` format.
 
 2. Execute the `main.py` script to train and evaluate the CNN architectures on the dataset:
 
@@ -36,7 +36,9 @@ pip install -r requirements.txt
 python main.py
 ```
 
-The script will preprocess the hyperspectral image data, split it using leave-one-out cross-validation, and train each architecture on the dataset. The models' performance metrics will be displayed in the terminal, and the classification reports will be saved in the `results` folder.
+3. Modify the CNN architectures in the 'CNN_models.py' file under the 'models' folder based on your data's characteristics and output requirements
+
+The script will normalize the hyperspectral image data, split it using leave-one-out cross-validation, and train each architecture on the dataset. The models' performance metrics will be displayed in the terminal, and the classification reports will be saved in the `results` folder.
 
 ## Results
 
