@@ -18,7 +18,7 @@ This project aims to compare various Convolutional Neural Network (CNN) architec
 1. Clone the repository:
 ```
 git clone https://github.com/naumanb/HSI_CNNs.git
-cd brain-cancer-hsi-classification
+cd HSI_CNNs
 ```
 
 2. Install the required dependencies using pip:
