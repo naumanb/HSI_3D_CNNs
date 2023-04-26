@@ -36,8 +36,6 @@ pip install -r requirements.txt
 python main.py
 ```
 
-3. Modify the CNN architectures in the 'CNN_models.py' file under the 'models' folder based on your data's characteristics and output requirements
-
 The script will normalize the hyperspectral image data, split it using leave-one-out cross-validation, and train each architecture on the dataset. The models' performance metrics will be displayed in the terminal, and the classification reports will be saved in the `results` folder.
 
 ## Results
