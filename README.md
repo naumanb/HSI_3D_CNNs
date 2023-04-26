@@ -2,7 +2,7 @@
 Comparison of CNN Algorithms for Glioma Tumor Segmentation in Brain HS Images
 </h2>
   
-This project aims to compare various Convolutional Neural Network (CNN) architectures for classifying brain cancer in Hyperspectral Images (HSI). The implemented algorithms are inspired by the paper "Comparison of CNN Algorithms on Hyperspectral Image Classification in Agricultural Lands" by Tien-Heng Hsieh† and Jean-Fu Kiang*† [1]. The CNN architectures mentioned in the paper were adapted and used on the HSI Brain Cancer dataset. The algorithms include 1D CNN, 2D CNN, 1D + 2D Hybrid CNN, 2D + 1D Hybrid CNN, and 3D CNN. The models are trained and evaluated using the leave-one-out cross-validation method on a dataset of hyperspectral brain cancer images.
+This project aims to compare various Convolutional Neural Network (CNN) architectures for classifying brain cancer in Hyperspectral Images (HSI). The implemented algorithms are inspired by the paper "Comparison of CNN Algorithms on Hyperspectral Image Classification in Agricultural Lands" by Tien-Heng Hsieh† and Jean-Fu Kiang*† [1]. The CNN architectures mentioned in the paper were adapted and used on the HSI Brain Cancer dataset [2]. The algorithms include 1D CNN, 2D CNN, 1D + 2D Hybrid CNN, 2D + 1D Hybrid CNN, and 3D CNN. The models are trained and evaluated using the leave-one-out cross-validation method on a dataset of hyperspectral brain cancer images.
 
 ## Getting Started
 
@@ -69,4 +69,8 @@ If you would like to contribute to this project, please fork the repository and 
 
 This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for more information.
 
+## References
+[1] Hsieh, T. H., & Kiang, J. F. (2020). Comparison of CNN algorithms on hyperspectral image classification in agricultural lands. Sensors, 20(6), 1734.
+
+[2] Fabelo, H., Ortega, S., Szolna, A., Bulters, D., Piñeiro, J. F., Kabwama, S., ... & Sarmiento, R. (2019). In-vivo hyperspectral human brain image database for brain cancer detection. IEEE Access, 7, 39098-39116.
 
