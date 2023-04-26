@@ -1,5 +1,5 @@
 <h2 align="center">
-Comparison of CNN Algorithms for Tumor Segmentation in HS Images
+Comparison of CNN Algorithms for Glioma Tumor Segmentation in Brain HS Images
 </h2>
   
 This project aims to compare various Convolutional Neural Network (CNN) architectures for classifying brain cancer in Hyperspectral Images (HSI). The implemented architectures include 1D CNN, 2D CNN, 1D + 2D Hybrid CNN, 2D + 1D Hybrid CNN, and 3D CNN. The models are trained and evaluated using the leave-one-out cross-validation method on a dataset of hyperspectral brain cancer images.
@@ -14,6 +14,23 @@ This project aims to compare various Convolutional Neural Network (CNN) architec
 - Scikit-learn 0.24 or higher
 - Numpy 1.19 or higher
 - Matplotlib 3.4 or higher
+
+### Tasks
+
+Status: Partially Complete
+
+- [x] Loading .mat data
+- [x] Preprocessing for NN input (normalizing, cropping)
+- [ ] Data augmentation for unlabeled pixels
+- [x] Plotting/visualizing images and labels
+- [x] Leave-one-image-out implementation
+- [x] Custom loss and metric functions
+- [x] 1-D CNN Implementation
+- [ ] 2-D CNN Implementation
+- [ ] 1-D + 2-D Hybrid
+- [ ] 2-D + 1-D Hybrid
+- [ ] 3-D CNN Implementation
+- [x] Saving results
 
 ### Installation
 
