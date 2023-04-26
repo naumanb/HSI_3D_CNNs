@@ -15,6 +15,23 @@ This project aims to compare various Convolutional Neural Network (CNN) architec
 - Numpy 1.19 or higher
 - Matplotlib 3.4 or higher
 
+### Tasks
+
+Status: Partially Complete
+
+- [x] Loading .mat data
+- [x] Preprocessing for NN input (normalizing, cropping)
+- [ ] Data augmentation for unlabeled pixels
+- [x] Plotting/visualizing images and labels
+- [x] Leave-one-image-out implementation
+- [x] Custom loss and metric functions
+- [x] 1-D CNN Implementation
+- [ ] 2-D CNN Implementation
+- [ ] 1-D + 2-D Hybrid
+- [ ] 2-D + 1-D Hybrid
+- [ ] 3-D CNN Implementation
+- [x] Saving results
+
 ### Installation
 
 1. Clone the repository:
