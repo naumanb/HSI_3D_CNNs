@@ -2,7 +2,7 @@
 Comparison of CNN Algorithms for Glioma Tumor Segmentation in Brain HS Images
 </h2>
   
-This project aims to compare various Convolutional Neural Network (CNN) architectures for classifying brain cancer in Hyperspectral Images (HSI). The implemented algorithms are inspired by the paper "Comparison of CNN Algorithms on Hyperspectral Image Classification in Agricultural Lands" by Tien-Heng Hsieh† and Jean-Fu Kiang*† [1]. The CNN architectures mentioned in the paper were adapted and used on the HSI Brain Cancer dataset [2]. The algorithms include 1D CNN, 2D CNN, 1D + 2D Hybrid CNN, 2D + 1D Hybrid CNN, and 3D CNN. The models are trained and evaluated using the leave-one-out cross-validation method on a dataset of hyperspectral brain cancer images.
+This project aims to compare various Convolutional Neural Network (CNN) architectures for classifying brain cancer in Hyperspectral Images (HSI). The implemented algorithms are inspired by the paper "Comparison of CNN Algorithms on Hyperspectral Image Classification in Agricultural Lands" by Tien-Heng Hsieh† and Jean-Fu Kiang*† [1]. The CNN architectures mentioned in the paper were adapted and used on the HSI Brain Cancer dataset [2]. The algorithms include 1D CNN, 2D CNN, 1D + 2D Hybrid CNN, 2D + 1D Hybrid CNN, and 3D CNN. The models are trained and evaluated using the leave-one-image-out cross-validation method on a dataset of hyperspectral brain cancer images.
 
 ## Getting Started
 
@@ -55,11 +55,11 @@ pip install -r requirements.txt
 python main.py
 ```
 
-The script will normalize the hyperspectral image data, split it using leave-one-out cross-validation, and train each architecture on the dataset. The models' performance metrics will be displayed in the terminal, and the classification reports will be saved in the `results` folder.
+The script normalizes the hyperspectral image data, split it using leave-one-out cross-validation, and train each architecture on the dataset. The models' performance metrics are displayed in the terminal, and the classification reports are saved in the `results` folder.
 
 ## Results
 
-The performance metrics for each architecture, such as precision, recall, and F1-score, will be saved in a text file in the `results` folder. You can compare these metrics to analyze the performance of each architecture for the given task.
+The performance metrics for each architecture, such as precision, recall, and F1-score, are saved in a text file in the `results` folder. The metrics are compared to analyze the performance of each algorithm for the given task.
 
 ## Contributing
 
